@@ -29,7 +29,7 @@ import  logo from "../assets/KIA-logo.png";
 import { Outlet } from 'react-router-dom';
 
 const navigation = [
-  { name: 'Home', href: '/home', icon: HomeIcon, current: true },
+  { name: 'Home', href: '/karnataka-itihasa-academy/', icon: HomeIcon, current: true },
   // { name: 'Team', href: '#', icon: UsersIcon, current: false },
   { name: 'Projects', href: '#', icon: FolderIcon, current: false },
   { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },

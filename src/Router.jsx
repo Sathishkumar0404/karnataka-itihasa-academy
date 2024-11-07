@@ -6,11 +6,11 @@ import Home from "./pages/home/index.jsx";
   const router = createBrowserRouter(
     [
         {
-            path: "/",
+            path: "/karnataka-itihasa-academy/",
             element: <SidebarLayout />,
             children:[
               {
-                path: "/home",
+                path: "",
                 element: <Home />
               }
             ]
