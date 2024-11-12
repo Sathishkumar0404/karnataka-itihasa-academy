@@ -1,11 +1,11 @@
+/* eslint-disable react/prop-types */
 // import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 // import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
-import { supabase } from '../../../utils/supabase';
-import { useEffect, useState } from 'react';
-import Loadig from '../../components/Loading';
-
-
-
+import { supabase } from "../../../utils/supabase";
+import { Fragment, useEffect, useState } from "react";
+import Loading from "../../components/Loading";
+import { Dialog, Transition } from "@headlessui/react";
+// import { debounce } from 'lodash';
 
 // const statuses = {
 //   Complete: 'text-green-700 bg-green-50 ring-green-600/20',
@@ -13,208 +13,612 @@ import Loadig from '../../components/Loading';
 //   Archived: 'text-yellow-800 bg-yellow-50 ring-yellow-600/20',
 // }
 
-  
-
 // function classNames(...classes) {
 //   return classes.filter(Boolean).join(' ')
 // }
 
+export function SearchComponent({
+  selectedColumns,
+  setSelectedColumns,
+  records,
+  searchText,
+  setSearchText,
+  setApplyfilter,
+  total,
+}) {
+  const [show, setShow] = useState(true);
+  const [results, setResults] = useState([]);
+  const [queryType, setQueryType] = useState("search");
+  const [isOpen, setIsOpen] = useState(false);
 
-// eslint-disable-next-line react/prop-types
-export function SearchComponent({setSelectedColumns, getrecords, searchText, setSearchText, total}) {
-    const [show, setShow] = useState(true);
-    const searchIndexs= [
-        {
-          name: "Year",
-          column: "year"
-        },
-        {
-          name: "Volume",
-          column: "volume"
-        },
-        {
-          name: "Article Name",
-          column: "article_name"
-        },{
-          name: "Link",
-          column: "link"
-        },
-        {
-          name: "Dynasty In Kannada",
-          column: "dynasty_in_kannada"
-        },
-        {
-          name: "Dynasty",
-          column: "dynasty"
-        },
-        {
-          name: "District In Kannada",
-          column: "district_in_kannada"
-        },
-        {
-          name: "District",
-          column: "district"
-        },
-        {
-          name: "Author Name",
-          column: "authorname_in_english"
-        },
-        {
-          name: "Author Name In Kannada",
-          column: "author_in_kannada"
-        },
-        {
-          name: "Subject",
-          column: "subject"
-        },
-        {
-          name: "Subject 2",
-          column: ""
-        },
-        {
-          name: "Subject In Kannada",
-          column: "subject_in_kannada"
-        },
-        {
-          name: "Subject 2 In Kannada",
-          column: "Subject_2_in_kannada"
-        },
-        {
-          name: "Time Period",
-          column: "time_period"
-        },
-        {
-          name: "Taluk",
-          column: "taluk"
-        },
-        {
-          name: "State",
-          column: "state"
-        },
-        {
-          name: "Description",
-          column: "description"
-        },
-    ] 
-    const handleCheckboxChange = (e) => {
-      const { id, checked } = e.target;
-  
-      // Update the selected columns state based on the checkbox selection
-      if (checked) {
-        setSelectedColumns((prev) => [...prev, id]); // Add column to selected list
-      } else {
-        setSelectedColumns((prev) => prev.filter((col) => col !== id)); // Remove column from selected list
-      }
-    };
-    
-    const handleSearchTextChange = (e) => {
-      setSearchText(e.target.value); // Update the search text state
-    };
-    return (
-        <div className="">
-          
-            <div className="2xl:container 2xl:mx-auto">
-                <div className=" md:py-12 lg:px-20 md:px-6 py-9 px-4">
-                    <p className=" text-sm leading-3 text-gray-600 font-normal mb-2">Home - Filters</p>
-                    <div className=" flex justify-between items-center mb-4">
-                        <h2 className=" lg:text-4xl text-3xl lg:leading-9 leading-7 text-gray-800 font-semibold">ITIHASA&#39;s</h2>
-                        {/* filters Button (md and plus Screen) */}
-                        <button onClick={() => setShow(!show)} className=" cursor-pointer sm:flex hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-4 px-6 bg-gray-800  text-base leading-4 font-normal text-white justify-center items-center ">
-                            <svg className=" mr-2" width={24} height={24} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6 12C7.10457 12 8 11.1046 8 10C8 8.89543 7.10457 8 6 8C4.89543 8 4 8.89543 4 10C4 11.1046 4.89543 12 6 12Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M6 4V8" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M6 12V20" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M12 18C13.1046 18 14 17.1046 14 16C14 14.8954 13.1046 14 12 14C10.8954 14 10 14.8954 10 16C10 17.1046 10.8954 18 12 18Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M12 4V14" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M12 18V20" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M18 9C19.1046 9 20 8.10457 20 7C20 5.89543 19.1046 5 18 5C16.8954 5 16 5.89543 16 7C16 8.10457 16.8954 9 18 9Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M18 4V5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M18 9V20" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            Filters
-                        </button>
-                    </div>
-                    <p className=" text-xl leading-5 text-gray-600 font-medium">{total}</p>
-                    {/* Filters Button (Small Screen) */}
-                    <button onClick={() => setShow(!show)} className=" cursor-pointer mt-6  sm:hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-2 w-full bg-gray-800 flex text-base leading-4 font-normal text-white justify-center items-center ">
-                        <svg className=" mr-2" width={24} height={24} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 12C7.10457 12 8 11.1046 8 10C8 8.89543 7.10457 8 6 8C4.89543 8 4 8.89543 4 10C4 11.1046 4.89543 12 6 12Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M6 4V8" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M6 12V20" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M12 18C13.1046 18 14 17.1046 14 16C14 14.8954 13.1046 14 12 14C10.8954 14 10 14.8954 10 16C10 17.1046 10.8954 18 12 18Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M12 4V14" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M12 18V20" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M18 9C19.1046 9 20 8.10457 20 7C20 5.89543 19.1046 5 18 5C16.8954 5 16 5.89543 16 7C16 8.10457 16.8954 9 18 9Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M18 4V5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M18 9V20" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        Filters
-                    </button>
-                </div>
-                <div className={`relative ${show ? "hidden" : ""}  lg:px-20 md:px-6 py-10 px-8 bg-gray-50 w-full lg:pb-48`}>
-                    <div className=" grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 lg:gap-y-0 md:gap-y-24 gap-y-14 ">
-                        {/* Cross button Code */}
-                        <div onClick={() => setShow(!show)} className="cursor-pointer absolute right-0 top-0 md:py-10 lg:px-20 md:px-6 py-9 px-4">
-                            <svg className=" lg:w-6 lg:h-6 w-4 h-4" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M25 1L1 25" stroke="#1F2937" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M1 1L25 25" stroke="#27272A" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </div>
-                   
-                        
-                        {/* Material Section */}
-                        <div className=" flex flex-col col-span-3 space-y-8 lg:justify-start lg:items-start md:justify-start md:items-center">
-                            <div className=" flex flex-col space-y-8 justify-start items-start ">
-                                <p className=" lg:text-2xl text-xl lg:leading-6 leading-5 font-medium text-gray-800 ">Search By</p>
-                                <div className="grid grid-cols-3 w-full gap-8">
-                                  {searchIndexs.map((searchindex)=>(<div key={searchindex.column} className=" flex w-full">
-                                      <input onChange={handleCheckboxChange} className="w-4 h-4 mr-2" type="checkbox" id={searchindex.column} name={searchindex.column} defaultValue={searchindex.column} />
-                                      <div className=" inline-block">
-                                          <div className=" flex space-x-6 justify-center items-center">
-                                              <label className=" mr-2 text-sm leading-3 font-normal text-gray-600" htmlFor={searchindex.column}>
-                                                  {searchindex.name}
-                                              </label>
-                                          </div>
-                                      </div>
-                                  </div>))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="mt-8">
-                      <input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchText}
-                        onChange={handleSearchTextChange}
-                        className="border w-full p-2 rounded"
-                      />
-                    </div>
-                    {/* Apply Filter Button (Large Screen) */}
-                    <div className=" hidden md:block absolute right-0 bottom-0 md:py-10 lg:px-20 md:px-6 py-9 px-4">
-                        <button onClick={()=>getrecords()} className="hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800">
-                            Apply Filter
-                        </button>
-                    </div>
-                    {/* Apply Filter Button (Table or lower Screen) */}
-                    <div className="block md:hidden w-full mt-16 ">
-                        <button onClick={()=>getrecords()} className=" w-full hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800">
-                            Apply Filter
-                        </button>
-                    </div>
-                </div>
+  useEffect(() => {
+    // eslint-disable-next-line react/prop-types
+    if (queryType === "search" && searchText.length > 0) {
+      setResults(records);
+    } else {
+      setResults([]);
+    }
+  }, [records]);
+
+  // Handle click on an autocomplete suggestion
+  const handleSuggestionClick = (suggestion) => {
+    // setQuery(suggestion.article_name);
+    setSearchText(suggestion.article_name);
+    setResults([]);
+    setQueryType("suggestion");
+  };
+
+  const handleSearchTextChange = (e) => {
+    setSearchText(e.target.value);
+    setQueryType("search");
+  };
+  const OpenModel = () => {
+    setIsOpen(true);
+  };
+  const handleClear = () =>{
+    setSearchText('');
+    setSelectedColumns({});
+    setApplyfilter(prev=>!prev)
+  };
+  return (
+    <div className="">
+      <DialogModel
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        selectedColumns={selectedColumns}
+        setSelectedColumns={setSelectedColumns}
+        setApplyfilter={setApplyfilter}
+      />
+      <div className="2xl:container 2xl:mx-auto">
+        <div className=" md:py-12 lg:px-20 md:px-6 py-9 px-4">
+          <div className=" flex justify-between items-center mb-4">
+            {/* <h2 className=" lg:text-4xl text-3xl lg:leading-9 leading-7 text-gray-800 font-semibold">ITIHASA&#39;s</h2> */}
+            {/* filters Button (md and plus Screen) */}
+            <p className=" text-sm leading-3 text-gray-600 font-normal mb-2">
+              Total - {total}
+            </p>
+            <button
+              onClick={() => setShow(!show)}
+              className=" ml-auto cursor-pointer sm:flex hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-4 px-6 bg-gray-800  text-base leading-4 font-normal text-white justify-center items-center "
+            >
+              <svg
+                className=" mr-2"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6 12C7.10457 12 8 11.1046 8 10C8 8.89543 7.10457 8 6 8C4.89543 8 4 8.89543 4 10C4 11.1046 4.89543 12 6 12Z"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M6 4V8"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M6 12V20"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 18C13.1046 18 14 17.1046 14 16C14 14.8954 13.1046 14 12 14C10.8954 14 10 14.8954 10 16C10 17.1046 10.8954 18 12 18Z"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 4V14"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 18V20"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M18 9C19.1046 9 20 8.10457 20 7C20 5.89543 19.1046 5 18 5C16.8954 5 16 5.89543 16 7C16 8.10457 16.8954 9 18 9Z"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M18 4V5"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M18 9V20"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Filters
+            </button>
+            {(searchText || Object.keys(selectedColumns)?.length > 0) &&<button onClick={handleClear} className="cursor-pointer ml-4 flex hover:bg-red-700  focus:ring focus:ring-offset-2 focus:ring-red-800 py-4 px-6 bg-red-800  text-base leading-4 font-normal text-white justify-center items-center">
+              Clear
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>}
+          </div>
+          {/* <p className=" text-xl leading-5 text-gray-600 font-medium">{total}</p> */}
+          {/* Filters Button (Small Screen) */}
+          <button
+            onClick={() => setShow(!show)}
+            className=" cursor-pointer mt-6  sm:hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-2 w-full bg-gray-800 flex text-base leading-4 font-normal text-white justify-center items-center "
+          >
+            <svg
+              className=" mr-2"
+              width={24}
+              height={24}
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 12C7.10457 12 8 11.1046 8 10C8 8.89543 7.10457 8 6 8C4.89543 8 4 8.89543 4 10C4 11.1046 4.89543 12 6 12Z"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M6 4V8"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M6 12V20"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 18C13.1046 18 14 17.1046 14 16C14 14.8954 13.1046 14 12 14C10.8954 14 10 14.8954 10 16C10 17.1046 10.8954 18 12 18Z"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 4V14"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 18V20"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M18 9C19.1046 9 20 8.10457 20 7C20 5.89543 19.1046 5 18 5C16.8954 5 16 5.89543 16 7C16 8.10457 16.8954 9 18 9Z"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M18 4V5"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M18 9V20"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Filters
+          </button>
+        </div>
+        <div
+          className={`relative ${
+            show ? "hidden" : ""
+          }  lg:px-20 md:px-6 py-10 px-8 bg-gray-50 w-full lg:pb-48`}
+        >
+          <div className=" grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 lg:gap-y-0 md:gap-y-24 gap-y-14 ">
+            {/* Cross button Code */}
+            Apply Filter{" "}
+            <div
+              onClick={() => setShow(!show)}
+              className="cursor-pointer absolute right-0 top-0 md:py-10 lg:px-20 md:px-6 py-9 px-4"
+            >
+              <svg
+                className=" lg:w-6 lg:h-6 w-4 h-4"
+                viewBox="0 0 26 26"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M25 1L1 25"
+                  stroke="#1F2937"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M1 1L25 25"
+                  stroke="#27272A"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </div>
-            <style>
-                {`
+            {/* Material Section */}
+          </div>
+          <div className="mt-8 ">
+            <input
+              type="search"
+              value={searchText}
+              onChange={handleSearchTextChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-500"
+              placeholder="Search..."
+            />
+            {/* {loading && <div className="absolute right-2 top-2 text-gray-500">Loading...</div>} */}
+            {results.length > 0 && (
+              <ul className="absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
+                {results.map((item, index) => (
+                  <li
+                    key={index}
+                    className="p-2 hover:bg-indigo-100 cursor-pointer"
+                    onClick={() => handleSuggestionClick(item)}
+                  >
+                    {/* Highlight matched text */}
+                    <span>{item.article_name}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {/* Apply Filter Button (Large Screen) */}
+          <div className=" hidden md:block absolute right-0 bottom-0 md:py-10 lg:px-20 md:px-6 py-9 px-4">
+            <button
+              onClick={OpenModel}
+              className="hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800"
+            >
+              Advanced Search
+            </button>
+          </div>
+          {/* Apply Filter Button (Table or lower Screen) */}
+          <div className="block md:hidden w-full mt-16 ">
+            <button
+              onClick={OpenModel}
+              className=" w-full hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800"
+            >
+              Advanced Search
+            </button>
+          </div>
+        </div>
+      </div>
+      <style>
+        {`
             .checkbox:checked + .check-icon {
              display: flex;
             }
             `}
-            </style>
-        </div>
-    );
+      </style>
+    </div>
+  );
 }
 
+// eslint-disable-next-line react/prop-types
+function DialogModel({
+  isOpen,
+  setIsOpen,
+  selectedColumns,
+  setSelectedColumns,
+  setApplyfilter,
+}) {
+  function closeModal() {
+    setIsOpen(false);
+  }
+  const searchIndexs = [
+    {
+      name: "Article Name",
+      column: "article_name",
+    },
+    {
+      name: "Year",
+      column: "year",
+    },
+    {
+      name: "Dynasty In Kannada",
+      column: "dynasty_in_kannada",
+    },
+    {
+      name: "Dynasty In English",
+      column: "dynasty",
+    },
+    {
+      name: "District In Kannada",
+      column: "district_in_kannada",
+    },
+    {
+      name: "District In English",
+      column: "district",
+    },
+    {
+      name: "Author Name In Kannada",
+      column: "author_in_kannada",
+    },
+    {
+      name: "Author Name In English",
+      column: "authorname_in_english",
+    },
+    {
+      name: "Subject In Kannada",
+      column: "subject_in_kannada",
+    },
+    {
+      name: "Subject In English",
+      column: "subject",
+    },
+    // {
+    //   name: "Subject 2 In Kannada",
+    //   column: "Subject_2_in_kannada",
+    // },
+    // {
+    //   name: "Subject 2 In English",
+    //   column: "subject_2",
+    // },
+    {
+      name: "Time Period",
+      column: "time_period",
+    },
+    {
+      name: "Taluk",
+      column: "taluk",
+    },
+    // {
+    //   name: "Description",
+    //   column: "description",
+    // },
+  ];
+  const [options, setOptions] = useState({
+    year: [],
+    district: [],
+    subject: [],
+    dynasty: [],
+    authorname_in_english: [],
+  });
+  const handleCheckboxChange = (e) => {
+    const { id, checked } = e.target;
+    // Update the selected columns state based on the checkbox selection
+    setSelectedColumns((prev) => {
+      if (checked) {
+        return { ...prev, [id]: { ischecked: true , searchText:options[id][0] } };
+      } else {
+        const newState = { ...prev };
+        delete newState[id];
+        return newState;
+      }
+    });
+  };
+  const selectcolumns = [
+    "year",
+    "district",
+    "subject",
+    "dynasty",
+    "authorname_in_english",
+    "district_in_kannada",
+    "subject_in_kannada",
+    "author_in_kannada",
+    "dynasty_in_kannada",
+    "taluk",
+    "time_period",
+  ];
+  useEffect(() => {
+    console.log("working");
+    const fetchOptions = async () => {
+      try {
+        // const newOptions = {}
+        //  columns.map(async(column) =>{
+        //  const { data, count } = await supabase.rpc('get', {
+        //   sql: `SELECT ${column}, COUNT(*) FROM karnataka_itihasa_records GROUP BY ${column}`
+        // });
+        //   newOptions[column] = data.map(item=>item[column])
+        //   console.log(count)
+        // }
+        // );
+        const promises = selectcolumns.map((column) =>
+          supabase.from("karnataka_itihasa_records").select(column)
+        );
+        // setOptions(newOptions);
+        const results = await Promise.all(promises);
+        const newOptions = {};
+        selectcolumns.forEach((column, index) => {
+          newOptions[column] = [
+            ...new Set(
+              results[index].data
+                .map((item) => item[column])
+                .sort()
+                .filter(Boolean)
+            ),
+          ];
+        });
+        setOptions(newOptions);
+      } catch (error) {
+        console.error("Error fetching options from Supabase:", error);
+      }
+    };
+    fetchOptions();
+  }, []);
+
+  const handleSearchTextChange = (e, column) => {
+    const { value } = e.target;
+    setSelectedColumns((prev) => ({
+      ...prev,
+      [column]: { ...prev[column], searchText: value },
+    }));
+  };
+  const handleapplyfilter = () => {
+    setApplyfilter((prev) => !prev);
+    closeModal();
+    // setTimeout(setSelectedColumns([]), 1000);
+  };
+  return (
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black/25" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Title
+                  as="h3"
+                  className="text-lg py-2 font-medium leading-6 text-gray-900"
+                >
+                  Advanced Search
+                </Dialog.Title>
+                <div className="mt-4">
+                  <div className="p-4 flex flex-col col-span-3 space-y-8 lg:justify-start lg:items-start md:justify-start md:items-center">
+                    <div className=" flex flex-col space-y-8 justify-start items-start ">
+                      {/* <p className=" lg:text-2xl text-xl lg:leading-6 leading-5 font-medium text-gray-800 ">Search By</p> */}
+                      <div className="grid grid-cols-3 w-full gap-8">
+                        {searchIndexs.map((searchindex) => (
+                          <div key={searchindex.column} className="flex w-full">
+                            <input
+                              onChange={handleCheckboxChange}
+                              className="w-4 h-4 mr-2"
+                              type="checkbox"
+                              id={searchindex.column}
+                              name={searchindex.column}
+                              defaultChecked={
+                                selectedColumns[searchindex.column]?.ischecked
+                              }
+                            />
+                            <div className="inline-bl ock">
+                              {" "}
+                              <label
+                                className="mr-2 text-sm leading-3 font-normal text-gray-600"
+                                htmlFor={searchindex.column}
+                              >
+                                {searchindex.name}
+                              </label>{" "}
+                              {selectedColumns[searchindex.column] &&
+                                selectedColumns[searchindex.column]
+                                  .ischecked && (
+                                  <div>
+                                    {selectcolumns.includes(
+                                      searchindex.column
+                                    ) ? (
+                                      <select
+                                        className="mt-2 -ml-4 p-1 border w-48 border-gray-300 rounded"
+                                        value={
+                                          selectedColumns[searchindex.column]
+                                            .searchText
+                                        }
+                                        placeholder={`Select  ${searchindex.name}`}
+                                        onChange={(e) =>
+                                          handleSearchTextChange(
+                                            e,
+                                            searchindex.column
+                                          )
+                                        }
+                                      >
+                                        {options[searchindex.column].map(
+                                          (option) => (
+                                            <option key={option} value={option}>
+                                              {option}
+                                            </option>
+                                          )
+                                        )}
+                                      </select>
+                                    ) : (
+                                      <input
+                                        type="text"
+                                        placeholder={`Enter ${searchindex.name}`}
+                                        className="mt-2 -ml-4 p-1 border w-48 border-gray-300 rounded"
+                                        value={
+                                          selectedColumns[searchindex.column]
+                                            .searchText
+                                        }
+                                        onChange={(e) =>
+                                          handleSearchTextChange(
+                                            e,
+                                            searchindex.column
+                                          )
+                                        }
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <button
+                    onClick={handleapplyfilter}
+                    className=" w-full hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800"
+                  >
+                    Apply Filter
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
+  );
+}
 
 export default function Home() {
   const [records, setRecords] = useState(null);
@@ -223,46 +627,53 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
   const [selectedColumns, setSelectedColumns] = useState([]);
-  const [searchText, setSearchText] = useState('');
-
+  const [searchText, setSearchText] = useState("");
+  const [applyfilter, setApplyfilter] = useState(false);
+  console.log(applyfilter);
   const buildQuery = async () => {
-    let query = supabase.from('karnataka_itihasa_records').select('*',{count: "exact"}).range((page - 1) * pageSize, page * pageSize - 1); // Replace 'your_table_name' with your actual table name
-
-    // If search text is provided, apply a LIKE filter to each selected column
-    const numericColumns = ['year', 'volume'];
-    if (searchText && selectedColumns.length > 0) {
-      const conditions = selectedColumns.map((column) => {
-        if (numericColumns.includes(column) && !isNaN(searchText)) {
-          // For numeric columns, we do an equality comparison
-          return `${column}.eq.${parseInt(searchText)}`;
-        } else {
-          // For text columns, we use ilike (case-insensitive match)
-          return `${column}.ilike.%${searchText}%`;
+    const numericColumns = ["year", "volume"];
+    let query = supabase
+      .from("karnataka_itihasa_records")
+      .select("*", { count: "exact" })
+      .range((page - 1) * pageSize, page * pageSize - 1);
+    if (Object.keys(selectedColumns)?.length > 0) {
+      const conditions = Object.entries(selectedColumns).map(
+        ([column, value]) => {
+          if (numericColumns.includes(column) && !isNaN(value.searchText)) {
+            return `${column}.eq.${Number(value.searchText)}`;
+          } else {
+            const escapedText =value.searchText.replace(/\s*\(.*?\)\s*/g, '%').trim();
+            console.log(escapedText)
+            return `${column}.ilike.%${escapedText}%`;
+          }
         }
-      });
-  
-      // Combine all conditions with an OR clause
-      const orCondition = conditions.join(',');
-  
-      // Apply the OR condition to the query
+      );
+      const orCondition = conditions.join(",");
       query = query.or(orCondition);
+    } else if (searchText) {
+      query = query.textSearch("article_name", searchText, {
+        type: "websearch",
+      });
     }
-    return query
+    return query;
   };
-
-
-  const getrecords =  async () =>{
-    const {data: records, error, count} = await  buildQuery();
-
-    console.log(records, error, count);
+  console.log(selectedColumns);
+  const getrecords = async () => {
+    const { data: records, count } = await buildQuery();
     setRecords(records);
-    setTotal(count)
+    setTotal(count);
     setTotalPages(Math.ceil(count / pageSize));
-  }
-  useEffect(()=>{
+    return records;
+  };
+  useEffect(() => {
+    setPage(1);
     getrecords();
-  },[page])
-  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ searchText, applyfilter]);
+
+  useEffect(() => { 
+    getrecords(); 
+  }, [page]);
 
   const handlePrevious = () => {
     if (page > 1) setPage((prev) => prev - 1);
@@ -272,71 +683,72 @@ export default function Home() {
     if (page < totalPages) setPage((prev) => prev + 1);
   };
 
-
-
   return (
     <div className="px-20 py-10">
-                <SearchComponent getrecords={getrecords} setSelectedColumns={setSelectedColumns} searchText={searchText} setSearchText={setSearchText} total={total} />
-        {records?<ul role="list" className=" grid grid-cols-3 gap-4">
-
+      <SearchComponent
+        records={records}
+        setSelectedColumns={setSelectedColumns}
+        selectedColumns={selectedColumns}
+        searchText={searchText}
+        setSearchText={setSearchText}
+        setApplyfilter={setApplyfilter}
+        total={total}
+      />
+      {records ? (
+        <ul role="list" className=" mt-4 grid grid-cols-3 gap-4">
           {records?.map((record) => (
-            <li key={record.id} className="flex flex-col border rounded-md border-gray-300 justify-between gap-x-6 p-4">
+            <li
+              key={record.id}
+              className="flex flex-col border rounded-md border-gray-300 justify-between gap-x-6 p-4"
+            >
               <div className="min-w-0">
                 <div className="flex items-start gap-x-3">
-                  <p className="text-sm/6 font-semibold text-gray-900">{record.article_name}</p>
-                  <p className="text-sm/6 font-semibold text-gray-900">{record.article_name}</p>
-                  {/* <p
-                    className={classNames(
-                      statuses[record.status],
-                      'mt-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset',
-                    )}
-                  >
-                    {record.status}
-                  </p> */}
+                  <p className="text-sm/6 font-semibold text-gray-900">
+                    {record.article_name}
+                  </p>
                 </div>
-                <div className="mt-1 flex items-center gap-x-2 text-xs/5 text-gray-500">
-                  {/* <p className="whitespace-nowrap">
-                    Due on <time dateTime={record.dueDateTime}>{record.dueDate}</time>
-                  </p> */}
-                  {/* <svg viewBox="0 0 2 2" className="h-0.5 w-0.5 fill-current">
-                    <circle r={1} cx={1} cy={1} />
-                  </svg> */}
+                <div className="mt-1  grid grid-cols-2 items-center gap-x-2 text-xs/5 text-gray-500">
+                  <p className="truncate">ಲೇಖಕ: {record.author_in_kannada}</p>
+                  <p className="truncate">
+                    Author: {record.authorname_in_english}
+                  </p>
+                </div>
+                <div className="mt-1 grid grid-cols-2 items-center gap-x-2 text-xs/5 text-gray-500">
                   <p className="truncate">ವಿಷಯ: {record.subject_in_kannada}</p>
-                  <p className="truncate">ಕಾಲಾವಧಿ: {record.time_period}</p>
-                </div>
-                <div className="mt-1 flex items-center gap-x-2 text-xs/5 text-gray-500">
-                  {/* <p className="whitespace-nowrap">
-                    Due on <time dateTime={record.dueDateTime}>{record.dueDate}</time>
-                  </p> */}
-                  {/* <svg viewBox="0 0 2 2" className="h-0.5 w-0.5 fill-current">
-                    <circle r={1} cx={1} cy={1} />
-                  </svg> */}
                   <p className="truncate">Subject: {record.subject}</p>
-                  <p className="truncate">Time Period: {record.time_period}</p>
                 </div>
-                <p className="truncate">ಲೇಖಕ: {record.author_in_kannada}</p>
-                <p className="truncate">Author: {record.authorname_in_english}</p>
-                
+                <div className="mt-1  grid grid-cols-2 items-center gap-x-2 text-xs/5 text-gray-500">
+                  <p className="truncate">
+                    ರಾಜವಂಶ: {record.dynasty_in_kannada}
+                  </p>
+                  <p className="truncate">Dynasty: {record.dynasty}</p>
+                </div>
+                <div className="mt-1  grid grid-cols-2 items-center gap-x-2 text-xs/5 text-gray-500">
+                  <p className="truncate">
+                    ಜಿಲ್ಲೆ: {record.district_in_kannada}
+                  </p>
+                  <p className="truncate">District: {record.district}</p>
+                </div>
               </div>
               <div className="flex mt-auto justify-between items-center pt-4">
                 <a
                   href={record.link}
-                  target='_blank'
+                  target="_blank"
                   className="hidden rounded-md bg-gray-200 px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block"
                 >
                   View PDF<span className="sr-only">, {record.period}</span>
                 </a>
-                <a
-                  className="hidden rounded-md bg-gray-200 px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block"
-                >
+                <a className="hidden rounded-md bg-gray-200 px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block">
                   Details<span className="sr-only">, {record.period}</span>
                 </a>
               </div>
             </li>
           ))}
-          
-        </ul>:<Loadig />}
-        <div className="mt-4 flex justify-between">
+        </ul>
+      ) : (
+        <Loading />
+      )}
+      <div className="mt-4 flex justify-between">
         <button
           onClick={handlePrevious}
           disabled={page === 1}
@@ -344,7 +756,9 @@ export default function Home() {
         >
           Previous
         </button>
-        <span>Page {page} of {totalPages}</span>
+        <span>
+          Page {page} of {totalPages}
+        </span>
         <button
           onClick={handleNext}
           disabled={page === totalPages}
@@ -353,7 +767,6 @@ export default function Home() {
           Next
         </button>
       </div>
-
     </div>
-  )
+  );
 }
