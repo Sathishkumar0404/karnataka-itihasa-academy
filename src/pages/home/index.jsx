@@ -419,7 +419,7 @@ function DialogModel({
     // Update the selected columns state based on the checkbox selection
     setSelectedColumns((prev) => {
       if (checked) {
-        return { ...prev, [id]: { ischecked: true , searchText:options[id][0] } };
+        return { ...prev, [id]: { ischecked: true , searchText: selectcolumns.includes(id)?options[id][0]:'' } };
       } else {
         const newState = { ...prev };
         delete newState[id];
