@@ -25,6 +25,8 @@ export function SearchComponent({
   setSearchText,
   setApplyfilter,
   total,
+  language,
+  setLanguage
 }) {
   const [show, setShow] = useState(true);
   const [results, setResults] = useState([]);
@@ -59,6 +61,7 @@ export function SearchComponent({
     setSearchText('');
     setSelectedColumns({});
     setApplyfilter(prev=>!prev)
+    setLanguage(null);
   };
   return (
     <div className="">
@@ -68,6 +71,8 @@ export function SearchComponent({
         selectedColumns={selectedColumns}
         setSelectedColumns={setSelectedColumns}
         setApplyfilter={setApplyfilter}
+        language={language}
+        setLanguage={setLanguage}
       />
       <div className="2xl:container 2xl:mx-auto">
         <div className=" md:py-12 lg:px-20 md:px-6 py-9 px-4">
@@ -341,11 +346,13 @@ function DialogModel({
   selectedColumns,
   setSelectedColumns,
   setApplyfilter,
+  language,
+  setLanguage
 }) {
   function closeModal() {
     setIsOpen(false);
   }
-  const searchIndexs = [
+  const kannada = [
     {
       name: "Article Name",
       column: "article_name",
@@ -355,45 +362,52 @@ function DialogModel({
       column: "year",
     },
     {
-      name: "Dynasty In Kannada",
+      name: "Dynasty",
       column: "dynasty_in_kannada",
     },
     {
-      name: "Dynasty In English",
-      column: "dynasty",
-    },
-    {
-      name: "District In Kannada",
+      name: "District",
       column: "district_in_kannada",
     },
     {
-      name: "District In English",
-      column: "district",
-    },
-    {
-      name: "Author Name In Kannada",
+      name: "Author Name",
       column: "author_in_kannada",
     },
     {
-      name: "Author Name In English",
-      column: "authorname_in_english",
-    },
-    {
-      name: "Subject In Kannada",
+      name: "Subject",
       column: "subject_in_kannada",
     },
     {
-      name: "Subject In English",
+      name: "Subject 2",
+      column: "subject_2_in_kannada",
+    },
+  ]
+  const english =  [
+    {
+      name: "Year",
+      column: "year",
+    },
+    {
+      name: "Dynasty",
+      column: "dynasty",
+    },
+    {
+      name: "District",
+      column: "district",
+    },
+    {
+      name: "Author Name",
+      column: "authorname_in_english",
+    },
+    {
+      name: "Subject",
       column: "subject",
     },
-    // {
-    //   name: "Subject 2 In Kannada",
-    //   column: "Subject_2_in_kannada",
-    // },
-    // {
-    //   name: "Subject 2 In English",
-    //   column: "subject_2",
-    // },
+    
+    {
+      name: "Subject 2",
+      column: "subject_2",
+    },
     {
       name: "Time Period",
       column: "time_period",
@@ -407,6 +421,14 @@ function DialogModel({
     //   column: "description",
     // },
   ];
+  const [searchIndexs, setSearchIndexs] = useState([]);
+  useEffect(()=>{
+    if(language==='kannada'){
+      setSearchIndexs(kannada);
+    }else{
+      setSearchIndexs(english);
+    }
+  },[language])
   const [options, setOptions] = useState({
     year: [],
     district: [],
@@ -426,15 +448,20 @@ function DialogModel({
         return newState;
       }
     });
+    if (Object.keys(selectedColumns)?.length > 0){
+      setLanguage(null);
+    }
   };
   const selectcolumns = [
     "year",
     "district",
     "subject",
+    "subject_2",
     "dynasty",
     "authorname_in_english",
     "district_in_kannada",
     "subject_in_kannada",
+    "subject_2_in_kannada",
     "author_in_kannada",
     "dynasty_in_kannada",
     "taluk",
@@ -503,7 +530,7 @@ function DialogModel({
         >
           <div className="fixed inset-0 bg-black/25" />
         </Transition.Child>
-
+        
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
@@ -518,99 +545,110 @@ function DialogModel({
               <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
-                  className="text-lg py-2 font-medium leading-6 text-gray-900"
+                  className="text-lg py-2 font-medium capitalize leading-6 text-gray-900"
                 >
-                  Advanced Search
+                  {language?`Advanced Search In ${language}`:"Select Language"}
                 </Dialog.Title>
-                <div className="mt-4">
-                  <div className="p-4 flex flex-col col-span-3 space-y-8 lg:justify-start lg:items-start md:justify-start md:items-center">
-                    <div className=" flex flex-col space-y-8 justify-start items-start ">
-                      {/* <p className=" lg:text-2xl text-xl lg:leading-6 leading-5 font-medium text-gray-800 ">Search By</p> */}
-                      <div className="grid grid-cols-3 w-full gap-8">
-                        {searchIndexs.map((searchindex) => (
-                          <div key={searchindex.column} className="flex w-full">
-                            <input
-                              onChange={handleCheckboxChange}
-                              className="w-4 h-4 mr-2"
-                              type="checkbox"
-                              id={searchindex.column}
-                              name={searchindex.column}
-                              defaultChecked={
-                                selectedColumns[searchindex.column]?.ischecked
-                              }
-                            />
-                            <div className="inline-bl ock">
-                              {" "}
-                              <label
-                                className="mr-2 text-sm leading-3 font-normal text-gray-600"
-                                htmlFor={searchindex.column}
-                              >
-                                {searchindex.name}
-                              </label>{" "}
-                              {selectedColumns[searchindex.column] &&
-                                selectedColumns[searchindex.column]
-                                  .ischecked && (
-                                  <div>
-                                    {selectcolumns.includes(
-                                      searchindex.column
-                                    ) ? (
-                                      <select
-                                        className="mt-2 -ml-4 p-1 border w-48 border-gray-300 rounded"
-                                        value={
-                                          selectedColumns[searchindex.column]
-                                            .searchText
-                                        }
-                                        placeholder={`Select  ${searchindex.name}`}
-                                        onChange={(e) =>
-                                          handleSearchTextChange(
-                                            e,
-                                            searchindex.column
-                                          )
-                                        }
-                                      >
-                                        {options[searchindex.column].map(
-                                          (option) => (
-                                            <option key={option} value={option}>
-                                              {option}
-                                            </option>
-                                          )
-                                        )}
-                                      </select>
-                                    ) : (
-                                      <input
-                                        type="text"
-                                        placeholder={`Enter ${searchindex.name}`}
-                                        className="mt-2 -ml-4 p-1 border w-48 border-gray-300 rounded"
-                                        value={
-                                          selectedColumns[searchindex.column]
-                                            .searchText
-                                        }
-                                        onChange={(e) =>
-                                          handleSearchTextChange(
-                                            e,
-                                            searchindex.column
-                                          )
-                                        }
-                                      />
-                                    )}
-                                  </div>
-                                )}
+                {!language &&<div className="p-4 min-h-48 flex items-center">
+                  <div className="grid grid-cols-2 w-full gap-4">
+                    <button onClick={()=>setLanguage('kannada')} className={`border py-12 text-xl border-gray-800 hover:bg-gray-800 hover:text-white hover:shadow-md ${language ==='kannada' && 'bg-gray-800 text-white'}`}>
+                      Kannada
+                    </button>
+                    <button onClick={()=>setLanguage('english')} className={`border py-12 text-xl border-gray-800 hover:bg-gray-800 hover:text-white hover:shadow-md ${language ==='english' && 'bg-gray-800 text-white'}`}>
+                      English
+                    </button>
+                  </div>
+                </div>}
+                {language &&<div>
+                  <div className="mt-4">
+                    <div className="p-4 flex flex-col col-span-3 space-y-8 lg:justify-start lg:items-start md:justify-start md:items-center">
+                      <div className=" flex flex-col space-y-8 justify-start items-start ">
+                        {/* <p className=" lg:text-2xl text-xl lg:leading-6 leading-5 font-medium text-gray-800 ">Search By</p> */}
+                        <div className="grid grid-cols-3 w-full gap-8">
+                          {searchIndexs.map((searchindex) => (
+                            <div key={searchindex.column} className="flex w-full">
+                              <input
+                                onChange={handleCheckboxChange}
+                                className="w-4 h-4 mr-2"
+                                type="checkbox"
+                                id={searchindex.column}
+                                name={searchindex.column}
+                                defaultChecked={
+                                  selectedColumns[searchindex.column]?.ischecked
+                                }
+                              />
+                              <div className="inline-bl ock">
+                                {" "}
+                                <label
+                                  className="mr-2 text-sm leading-3 font-normal text-gray-600"
+                                  htmlFor={searchindex.column}
+                                >
+                                  {searchindex.name}
+                                </label>{" "}
+                                {selectedColumns[searchindex.column] &&
+                                  selectedColumns[searchindex.column]
+                                    .ischecked && (
+                                    <div>
+                                      {selectcolumns.includes(
+                                        searchindex.column
+                                      ) ? (
+                                        <select
+                                          className="mt-2 -ml-4 p-1 border w-48 border-gray-300 rounded"
+                                          value={
+                                            selectedColumns[searchindex.column]
+                                              .searchText
+                                          }
+                                          placeholder={`Select  ${searchindex.name}`}
+                                          onChange={(e) =>
+                                            handleSearchTextChange(
+                                              e,
+                                              searchindex.column
+                                            )
+                                          }
+                                        >
+                                          {options[searchindex.column].map(
+                                            (option) => (
+                                              <option key={option} value={option}>
+                                                {option}
+                                              </option>
+                                            )
+                                          )}
+                                        </select>
+                                      ) : (
+                                        <input
+                                          type="text"
+                                          placeholder={`Enter ${searchindex.name}`}
+                                          className="mt-2 -ml-4 p-1 border w-48 border-gray-300 rounded"
+                                          value={
+                                            selectedColumns[searchindex.column]
+                                              .searchText
+                                          }
+                                          onChange={(e) =>
+                                            handleSearchTextChange(
+                                              e,
+                                              searchindex.column
+                                            )
+                                          }
+                                        />
+                                      )}
+                                    </div>
+                                  )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="mt-4">
-                  <button
-                    onClick={handleapplyfilter}
-                    className=" w-full hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800"
-                  >
-                    Apply Filter
-                  </button>
-                </div>
+                  <div className="mt-4">
+                    <button
+                      onClick={handleapplyfilter}
+                      className=" w-full hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800"
+                    >
+                      Apply Filter
+                    </button>
+                  </div>
+                </div>}
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -629,7 +667,7 @@ export default function Home() {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [applyfilter, setApplyfilter] = useState(false);
-  console.log(applyfilter);
+  const [language, setLanguage] = useState(null);
   const buildQuery = async () => {
     const numericColumns = ["year", "volume"];
     let query = supabase
@@ -693,6 +731,8 @@ export default function Home() {
         setSearchText={setSearchText}
         setApplyfilter={setApplyfilter}
         total={total}
+        language={language}
+        setLanguage={setLanguage}
       />
       {records ? (
         <ul role="list" className=" mt-4 grid grid-cols-3 gap-4">
