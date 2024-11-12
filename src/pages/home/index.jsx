@@ -5,17 +5,7 @@ import { supabase } from "../../../utils/supabase";
 import { Fragment, useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { Dialog, Transition } from "@headlessui/react";
-// import { debounce } from 'lodash';
-
-// const statuses = {
-//   Complete: 'text-green-700 bg-green-50 ring-green-600/20',
-//   'In progress': 'text-gray-600 bg-gray-50 ring-gray-500/10',
-//   Archived: 'text-yellow-800 bg-yellow-50 ring-yellow-600/20',
-// }
-
-// function classNames(...classes) {
-//   return classes.filter(Boolean).join(' ')
-// }
+import { Tab } from "@headlessui/react";
 
 export function SearchComponent({
   selectedColumns,
@@ -61,7 +51,6 @@ export function SearchComponent({
     setSearchText('');
     setSelectedColumns({});
     setApplyfilter(prev=>!prev)
-    setLanguage(null);
   };
   return (
     <div className="">
@@ -339,6 +328,10 @@ export function SearchComponent({
   );
 }
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
+
 // eslint-disable-next-line react/prop-types
 function DialogModel({
   isOpen,
@@ -448,9 +441,7 @@ function DialogModel({
         return newState;
       }
     });
-    if (Object.keys(selectedColumns)?.length > 0){
-      setLanguage(null);
-    }
+   
   };
   const selectcolumns = [
     "year",
@@ -471,15 +462,6 @@ function DialogModel({
     console.log("working");
     const fetchOptions = async () => {
       try {
-        // const newOptions = {}
-        //  columns.map(async(column) =>{
-        //  const { data, count } = await supabase.rpc('get', {
-        //   sql: `SELECT ${column}, COUNT(*) FROM karnataka_itihasa_records GROUP BY ${column}`
-        // });
-        //   newOptions[column] = data.map(item=>item[column])
-        //   console.log(count)
-        // }
-        // );
         const promises = selectcolumns.map((column) =>
           supabase.from("karnataka_itihasa_records").select(column)
         );
@@ -516,6 +498,7 @@ function DialogModel({
     closeModal();
     // setTimeout(setSelectedColumns([]), 1000);
   };
+  const tabs = [{title:"Kannada",value: "kannada"}, {title:"English",value: "english"}]
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -542,25 +525,36 @@ function DialogModel({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
                   className="text-lg py-2 font-medium capitalize leading-6 text-gray-900"
                 >
                   {language?`Advanced Search In ${language}`:"Select Language"}
                 </Dialog.Title>
-                {!language &&<div className="p-4 min-h-48 flex items-center">
-                  <div className="grid grid-cols-2 w-full gap-4">
-                    <button onClick={()=>setLanguage('kannada')} className={`border py-12 text-xl border-gray-800 hover:bg-gray-800 hover:text-white hover:shadow-md ${language ==='kannada' && 'bg-gray-800 text-white'}`}>
-                      Kannada
-                    </button>
-                    <button onClick={()=>setLanguage('english')} className={`border py-12 text-xl border-gray-800 hover:bg-gray-800 hover:text-white hover:shadow-md ${language ==='english' && 'bg-gray-800 text-white'}`}>
-                      English
-                    </button>
-                  </div>
-                </div>}
-                {language &&<div>
-                  <div className="mt-4">
+                <Tab.Group selectedIndex={language==="kannada"?0:1}>
+                  <Tab.List className="flex space-x-1 mt-4 rounded-xl bg-gray-900/20 p-1">
+                    {tabs.map((category)=><Tab
+                      key={category.title}
+                      onClick={()=>setLanguage(category.value)}
+                      className={({ selected }) =>
+                        classNames(
+                          'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
+                          'ring-white/60 ring-offset-2 ring-offset-gray-800 focus:outline-none focus:ring-2',
+                          selected
+                            ? 'bg-white text-gray-700 shadow'
+                            : 'text-black-100 hover:bg-white/[0.12]  '
+                        )
+                      }
+                    >
+                      {category.title}
+                    </Tab>)}
+
+                  </Tab.List>
+                </Tab.Group>
+                
+                <div className="">
+                  <div className="my-6">
                     <div className="p-4 flex flex-col col-span-3 space-y-8 lg:justify-start lg:items-start md:justify-start md:items-center">
                       <div className=" flex flex-col space-y-8 justify-start items-start ">
                         {/* <p className=" lg:text-2xl text-xl lg:leading-6 leading-5 font-medium text-gray-800 ">Search By</p> */}
@@ -648,7 +642,7 @@ function DialogModel({
                       Apply Filter
                     </button>
                   </div>
-                </div>}
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -667,7 +661,7 @@ export default function Home() {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [applyfilter, setApplyfilter] = useState(false);
-  const [language, setLanguage] = useState(null);
+  const [language, setLanguage] = useState("kannada");
   const buildQuery = async () => {
     const numericColumns = ["year", "volume"];
     let query = supabase
