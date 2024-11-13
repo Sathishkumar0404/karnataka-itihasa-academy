@@ -64,13 +64,15 @@ export function SearchComponent({
         setLanguage={setLanguage}
       />
       <div className="2xl:container 2xl:mx-auto">
-        <div className=" md:py-12 lg:px-20 md:px-6 py-9 px-4">
+        <div className=" md:py-8 lg:px-14 md:px-6 py-6 px-4">
           <div className=" flex justify-between items-center mb-4">
-            {/* <h2 className=" lg:text-4xl text-3xl lg:leading-9 leading-7 text-gray-800 font-semibold">ITIHASA&#39;s</h2> */}
-            {/* filters Button (md and plus Screen) */}
-            <p className=" text-sm leading-3 text-gray-600 font-normal mb-2">
-              Total - {total}
-            </p>
+            <div>
+              <h2 className="pb-4 lg:text-4xl text-3xl lg:leading-9 leading-7 text-gray-800 font-semibold">Articles</h2>
+              {/* filters Button (md and plus Screen) */}
+              <p className=" text-sm leading-3 text-gray-600 font-normal mb-2">
+                Total - {total}
+              </p>
+            </div>
             <button
               onClick={() => setShow(!show)}
               className=" ml-auto cursor-pointer sm:flex hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-4 px-6 bg-gray-800  text-base leading-4 font-normal text-white justify-center items-center "
@@ -240,7 +242,7 @@ export function SearchComponent({
         <div
           className={`relative ${
             show ? "hidden" : ""
-          }  lg:px-20 md:px-6 py-10 px-8 bg-gray-50 w-full lg:pb-48`}
+          }  lg:px-20 md:px-6 py-10 px-8 bg-gray-50 w-full lg:pb-32`}
         >
           <div className=" grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 lg:gap-y-0 md:gap-y-24 gap-y-14 ">
             {/* Cross button Code */}
@@ -273,7 +275,7 @@ export function SearchComponent({
             </div>
             {/* Material Section */}
           </div>
-          <div className="mt-8 ">
+          <div className="mt-8 relative">
             <input
               type="search"
               value={searchText}
@@ -283,7 +285,7 @@ export function SearchComponent({
             />
             {/* {loading && <div className="absolute right-2 top-2 text-gray-500">Loading...</div>} */}
             {results.length > 0 && (
-              <ul className="absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
+              <ul className="absolute max-h-96 overflow-y-auto z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
                 {results.map((item, index) => (
                   <li
                     key={index}
@@ -764,7 +766,7 @@ export default function Home() {
                   <p className="truncate">District: {record.district}</p>
                 </div>
               </div>
-              <div className="flex mt-auto justify-between items-center pt-4">
+              <div className="flex mt-auto justify-end items-center pt-4">
                 <a
                   href={record.link}
                   target="_blank"
@@ -772,9 +774,9 @@ export default function Home() {
                 >
                   View PDF<span className="sr-only">, {record.period}</span>
                 </a>
-                <a className="hidden rounded-md bg-gray-200 px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block">
+                {/* <a className="hidden rounded-md bg-gray-200 px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block">
                   Details<span className="sr-only">, {record.period}</span>
-                </a>
+                </a> */}
               </div>
             </li>
           ))}
