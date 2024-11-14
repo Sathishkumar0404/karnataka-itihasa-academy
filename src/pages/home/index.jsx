@@ -2,48 +2,25 @@
 // import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 // import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
 import { supabase } from "../../../utils/supabase";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { Dialog, Transition } from "@headlessui/react";
 import { Tab } from "@headlessui/react";
+import { AppContext } from "../../components/SidebarLayout";
 
 export function SearchComponent({
   selectedColumns,
   setSelectedColumns,
-  records,
   searchText,
   setSearchText,
   setApplyfilter,
-  total,
+  // total,
   language,
   setLanguage
 }) {
-  const [show, setShow] = useState(true);
-  const [results, setResults] = useState([]);
-  const [queryType, setQueryType] = useState("search");
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react/prop-types
-    if (queryType === "search" && searchText.length > 0) {
-      setResults(records);
-    } else {
-      setResults([]);
-    }
-  }, [records]);
-
   // Handle click on an autocomplete suggestion
-  const handleSuggestionClick = (suggestion) => {
-    // setQuery(suggestion.article_name);
-    setSearchText(suggestion.article_name);
-    setResults([]);
-    setQueryType("suggestion");
-  };
-
-  const handleSearchTextChange = (e) => {
-    setSearchText(e.target.value);
-    setQueryType("search");
-  };
+  
   const OpenModel = () => {
     setIsOpen(true);
   };
@@ -51,6 +28,65 @@ export function SearchComponent({
     setSearchText('');
     setSelectedColumns({});
     setApplyfilter(prev=>!prev)
+  };
+  const [options, setOptions] = useState({
+    year: [],
+    district: [],
+    volume: [],
+  });
+  const searchby = [
+    {
+      name: "District",
+      column: "district",
+    },
+    {
+      name: "Year",
+      column: "year",
+    },
+    {
+      name: "Volume",
+      column: "volume",
+    }
+  ]
+  
+  useEffect(() => {
+    console.log("working");
+    const fetchOptions = async () => {
+      try {
+        const promises = searchby.map(({column}) =>
+          supabase.from("karnataka_itihasa_records").select(column)
+        );
+        // setOptions(newOptions);
+        const results = await Promise.all(promises);
+        const newOptions = {};
+        searchby.forEach(({column}, index) => {
+          newOptions[column] = [
+            ...new Set(
+              results[index].data
+                .map((item) => item[column])
+                .sort()
+                .filter(Boolean)
+            ),
+          ];
+        });
+        setOptions(newOptions);
+      } catch (error) {
+        console.error("Error fetching options from Supabase:", error);
+      }
+    };
+    fetchOptions();
+  }, []);
+  const handleSearchTextChange = (e, column) => {
+    const { value } = e.target;
+    setSelectedColumns((prev) => ({
+      ...prev,
+      [column]: { ...prev[column], searchText: value },
+    }));
+    if(value !==''){
+      setApplyfilter(prev=>!prev)
+    }
+  
+    
   };
   return (
     <div className="">
@@ -63,18 +99,72 @@ export function SearchComponent({
         language={language}
         setLanguage={setLanguage}
       />
-      <div className="2xl:container 2xl:mx-auto">
+      <div className="2xl:container 2xl:mx-auto bg-gray-50">
         <div className=" md:py-8 lg:px-14 md:px-6 py-6 px-4">
           <div className=" flex justify-between items-center mb-4">
             <div>
-              <h2 className="pb-4 lg:text-4xl text-3xl lg:leading-9 leading-7 text-gray-800 font-semibold">Articles</h2>
-              {/* filters Button (md and plus Screen) */}
-              <p className=" text-sm leading-3 text-gray-600 font-normal mb-2">
-                Total - {total}
-              </p>
+              <div className="w-full space-y-3">
+                              {searchby.map((searchindex) => (
+                                <div key={searchindex.column} className="flex w-full">
+                                  {/* <input
+                                    onChange={handleCheckboxChange}
+                                    className="w-4 h-4 mr-2"
+                                    type="checkbox"
+                                    id={searchindex.column}
+                                    name={searchindex.column}
+                                    checked={selectedColumns[searchindex.column]?.ischecked}
+                                    defaultChecked={
+                                      selectedColumns[searchindex.column]?.ischecked
+                                    }
+                                  /> */}
+                                  <div className="inline-bl ock">
+                                    
+                                    <label
+                                      className="mr-2 text-md leading-3 font-normal text-gray-800"
+                                      htmlFor={searchindex.column}
+                                    >
+                                     Search by {searchindex.name}
+                                    </label>
+                                    
+                                        <div>
+                                            <select 
+                                              className="mt-2  p-1 border w-48 border-gray-300 rounded"
+                                              id={searchText.column}
+                                              value={
+                                                !selectedColumns[searchindex.column]?.searchText?'':selectedColumns[searchindex.column]?.searchText
+                                              }
+                                              placeholder={`Select  ${searchindex.name}`}
+                                              onChange={(e) =>
+                                                handleSearchTextChange(
+                                                  e,
+                                                  searchindex.column
+                                                )
+                                              }
+                                            >
+                                              {!selectedColumns[searchindex.column]?.searchText &&<option value="">Select {searchindex.name}</option>}
+                                              {options[searchindex.column].map(
+                                                (option) => (
+                                                  <option key={option} value={option}>
+                                                    {option}
+                                                  </option>
+                                                )
+                                              )}
+                                            </select>
+              
+                                        </div>
+                                  </div>
+                                </div>
+                              ))}
+              </div>
             </div>
+            {/* <div>
+              <h2 className="pb-4 lg:text-4xl text-3xl lg:leading-9 leading-7 text-gray-800 font-semibold">Articles</h2>
+              <p className=" text-sm leading-3 text-gray-600 font-normal mb-2">
+                {total}
+              </p>
+            </div> */}
             <button
-              onClick={() => setShow(!show)}
+              onClick={OpenModel}
               className=" ml-auto cursor-pointer sm:flex hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-4 px-6 bg-gray-800  text-base leading-4 font-normal text-white justify-center items-center "
             >
               <svg
@@ -149,7 +239,7 @@ export function SearchComponent({
                   strokeLinejoin="round"
                 />
               </svg>
-              Filters
+              Advanced Search
             </button>
             {(searchText || Object.keys(selectedColumns)?.length > 0) &&<button onClick={handleClear} className="cursor-pointer ml-4 flex hover:bg-red-700  focus:ring focus:ring-offset-2 focus:ring-red-800 py-4 px-6 bg-red-800  text-base leading-4 font-normal text-white justify-center items-center">
               Clear
@@ -161,7 +251,7 @@ export function SearchComponent({
           {/* <p className=" text-xl leading-5 text-gray-600 font-medium">{total}</p> */}
           {/* Filters Button (Small Screen) */}
           <button
-            onClick={() => setShow(!show)}
+            onClick={OpenModel}
             className=" cursor-pointer mt-6  sm:hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-2 w-full bg-gray-800 flex text-base leading-4 font-normal text-white justify-center items-center "
           >
             <svg
@@ -236,87 +326,8 @@ export function SearchComponent({
                 strokeLinejoin="round"
               />
             </svg>
-            Filters
+            Advanced Search
           </button>
-        </div>
-        <div
-          className={`relative ${
-            show ? "hidden" : ""
-          }  lg:px-20 md:px-6 py-10 px-8 bg-gray-50 w-full lg:pb-32`}
-        >
-          <div className=" grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 lg:gap-y-0 md:gap-y-24 gap-y-14 ">
-            {/* Cross button Code */}
-            Apply Filter{" "}
-            <div
-              onClick={() => setShow(!show)}
-              className="cursor-pointer absolute right-0 top-0 md:py-10 lg:px-20 md:px-6 py-9 px-4"
-            >
-              <svg
-                className=" lg:w-6 lg:h-6 w-4 h-4"
-                viewBox="0 0 26 26"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M25 1L1 25"
-                  stroke="#1F2937"
-                  strokeWidth="1.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M1 1L25 25"
-                  stroke="#27272A"
-                  strokeWidth="1.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            {/* Material Section */}
-          </div>
-          <div className="mt-8 relative">
-            <input
-              type="search"
-              value={searchText}
-              onChange={handleSearchTextChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-500"
-              placeholder="Search..."
-            />
-            {/* {loading && <div className="absolute right-2 top-2 text-gray-500">Loading...</div>} */}
-            {results.length > 0 && (
-              <ul className="absolute max-h-96 overflow-y-auto z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
-                {results.map((item, index) => (
-                  <li
-                    key={index}
-                    className="p-2 hover:bg-indigo-100 cursor-pointer"
-                    onClick={() => handleSuggestionClick(item)}
-                  >
-                    {/* Highlight matched text */}
-                    <span>{item.article_name}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          {/* Apply Filter Button (Large Screen) */}
-          <div className=" hidden md:block absolute right-0 bottom-0 md:py-10 lg:px-20 md:px-6 py-9 px-4">
-            <button
-              onClick={OpenModel}
-              className="hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800"
-            >
-              Advanced Search
-            </button>
-          </div>
-          {/* Apply Filter Button (Table or lower Screen) */}
-          <div className="block md:hidden w-full mt-16 ">
-            <button
-              onClick={OpenModel}
-              className=" w-full hover:bg-gray-700 focus:ring focus:ring-offset-2 focus:ring-gray-800 text-base leading-4 font-medium py-4 px-10 text-white bg-gray-800"
-            >
-              Advanced Search
-            </button>
-          </div>
         </div>
       </div>
       <style>
@@ -341,20 +352,15 @@ function DialogModel({
   selectedColumns,
   setSelectedColumns,
   setApplyfilter,
-  language,
-  setLanguage
 }) {
   function closeModal() {
     setIsOpen(false);
   }
+  const [language, setLanguage] = useState("english");
   const kannada = [
     {
-      name: "Article Name",
-      column: "article_name",
-    },
-    {
-      name: "Year",
-      column: "year",
+      name: "Author Name",
+      column: "author_in_kannada",
     },
     {
       name: "Dynasty",
@@ -364,10 +370,7 @@ function DialogModel({
       name: "District",
       column: "district_in_kannada",
     },
-    {
-      name: "Author Name",
-      column: "author_in_kannada",
-    },
+    
     {
       name: "Subject",
       column: "subject_in_kannada",
@@ -379,21 +382,14 @@ function DialogModel({
   ]
   const english =  [
     {
-      name: "Year",
-      column: "year",
+      name: "Author Name",
+      column: "authorname_in_english",
     },
     {
       name: "Dynasty",
       column: "dynasty",
     },
-    {
-      name: "District",
-      column: "district",
-    },
-    {
-      name: "Author Name",
-      column: "authorname_in_english",
-    },
+    
     {
       name: "Subject",
       column: "subject",
@@ -418,6 +414,7 @@ function DialogModel({
   ];
   const [searchIndexs, setSearchIndexs] = useState([]);
   useEffect(()=>{
+    setSelectedColumns({})
     if(language==='kannada'){
       setSearchIndexs(kannada);
     }else{
@@ -592,7 +589,8 @@ function DialogModel({
                                           className="mt-2 -ml-4 p-1 border w-48 border-gray-300 rounded"
                                           value={
                                             selectedColumns[searchindex.column]
-                                              .searchText
+                                              .searchText?selectedColumns[searchindex.column]
+                                              .searchText:''
                                           }
                                           placeholder={`Select  ${searchindex.name}`}
                                           onChange={(e) =>
@@ -655,15 +653,14 @@ function DialogModel({
 }
 
 export default function Home() {
-  const [records, setRecords] = useState(null);
+  const {records, setRecords, searchText, setSearchText} = useContext(AppContext)
   const [page, setPage] = useState(1);
   const [pageSize] = useState(30); // Set default page size
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
   const [selectedColumns, setSelectedColumns] = useState([]);
-  const [searchText, setSearchText] = useState("");
   const [applyfilter, setApplyfilter] = useState(false);
-  const [language, setLanguage] = useState("kannada");
+  const [language, setLanguage] = useState("english");
   const buildQuery = async () => {
     const numericColumns = ["year", "volume"];
     let query = supabase
@@ -671,19 +668,19 @@ export default function Home() {
       .select("*", { count: "exact" })
       .range((page - 1) * pageSize, page * pageSize - 1);
     if (Object.keys(selectedColumns)?.length > 0) {
-      const conditions = Object.entries(selectedColumns).map(
+       Object.entries(selectedColumns).map(
         ([column, value]) => {
           if (numericColumns.includes(column) && !isNaN(value.searchText)) {
-            return `${column}.eq.${Number(value.searchText)}`;
+            query = query.eq(column, Number(value.searchText));
           } else {
             const escapedText =value.searchText.replace(/\s*\(.*?\)\s*/g, '%').trim();
             console.log(escapedText)
-            return `${column}.ilike.%${escapedText}%`;
+            query = query.ilike(column, `%${escapedText}%`);
           }
         }
       );
-      const orCondition = conditions.join(",");
-      query = query.or(orCondition);
+      // const orCondition = conditions.join(",");
+      
     } else if (searchText) {
       query = query.textSearch("article_name", searchText, {
         type: "websearch",
@@ -772,7 +769,7 @@ export default function Home() {
                   target="_blank"
                   className="hidden rounded-md bg-gray-200 px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block"
                 >
-                  View PDF<span className="sr-only">, {record.period}</span>
+                  View<span className="sr-only">, {record.period}</span>
                 </a>
                 {/* <a className="hidden rounded-md bg-gray-200 px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block">
                   Details<span className="sr-only">, {record.period}</span>

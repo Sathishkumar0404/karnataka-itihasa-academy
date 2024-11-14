@@ -1,25 +1,11 @@
 
 'use client'
 
-import { createContext, useState } from 'react'
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-} from '@headlessui/react'
-import {
-  BellIcon,
-} from '@heroicons/react/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { createContext, useEffect, useState } from 'react'
+
+import {  MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import  logo from "../assets/KIA-logo.png";
 import { NavLink, Outlet } from 'react-router-dom';
-
-
-const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
-]
 
 
 
@@ -28,9 +14,34 @@ export const AppContext = createContext();
 
 
 export default function SidebarLayout() {
-  const [filter, setFilter] = useState(null)
+  const [searchText, setSearchText] = useState('');
+  const [records, setRecords] = useState(null);
+  const [results, setResults] = useState([]);
+  const [queryType, setQueryType] = useState("search");
+
+  useEffect(() => {
+    // eslint-disable-next-line react/prop-types
+    if (queryType === "search" && searchText.length > 0) {
+      setResults(records);
+    } else {
+      setResults([]);
+    }
+  }, [records]);
+
+  const handleSuggestionClick = (suggestion) => {
+    // setQuery(suggestion.article_name);
+    setSearchText(suggestion.article_name);
+    setResults([]);
+    setQueryType("suggestion");
+  };
+
+  const handleSearchTextChange = (e) => {
+    setSearchText(e.target.value);
+    setQueryType("search");
+  };
+  
   return (
-    <AppContext.Provider value={{filter}}>
+    <AppContext.Provider value={{ searchText, setSearchText, records, setRecords}} >
      
       <div>
 
@@ -55,8 +66,8 @@ export default function SidebarLayout() {
 
             <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
 
-            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-              {/* <div className="relative flex flex-1">
+            <div className="flex flex-1 relative gap-x-4 self-stretch lg:gap-x-6">
+              <div className="relative  flex flex-1">
                 <label htmlFor="search-field" className="sr-only">
                   Search
                 </label>
@@ -68,12 +79,27 @@ export default function SidebarLayout() {
                   id="search-field"
                   name="search"
                   type="search"
-                  onChange={(e)=>setFilter(e.target.value)}
-                  placeholder="Search..."
-                  className="block w-full border-0 py-0 my-2 pl-8 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
+                  value={searchText}
+                  onChange={handleSearchTextChange}
+                  placeholder="Search in Kannada"
+                  className="block w-[70%] border-0 py-0 my-2 pl-8 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
                 />
-              </div> */}
-             
+                
+              </div>
+              {results.length > 0 && (
+              <ul className="absolute w-[70%] max-h-96 mt-14 overflow-y-auto z-10 bg-white border border-gray-300 rounded-md shadow-lg">
+                {results.map((item, index) => (
+                  <li
+                    key={index}
+                    className="p-2 hover:bg-indigo-100 cursor-pointer"
+                    onClick={() => handleSuggestionClick(item)}
+                  >
+                    {/* Highlight matched text */}
+                    <span>{item.article_name}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
             </div>
           </div>
 
