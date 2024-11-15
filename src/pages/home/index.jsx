@@ -101,11 +101,11 @@ export function SearchComponent({
       />
       <div className="2xl:container 2xl:mx-auto bg-gray-50">
         <div className=" md:py-6 lg:px-14 md:px-6 py-4 px-4">
-          <div className=" flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center">
             <div>
-              <div className="w-full flex gap-4 items-center">
+              <div className="w-full xl:flex  gap-4 items-center">
                               {searchby.map((searchindex) => (
-                                <div key={searchindex.column} className="flex w-full">
+                                <div key={searchindex.column} className="lg:flex w-full">
                                   {/* <input
                                     onChange={handleCheckboxChange}
                                     className="w-4 h-4 mr-2"
@@ -117,7 +117,7 @@ export function SearchComponent({
                                       selectedColumns[searchindex.column]?.ischecked
                                     }
                                   /> */}
-                                  <div className="inline-block">
+                                  <div className="">
                                     
                                     <label
                                       className="mr-2 text-md leading-3 font-normal text-gray-800"
@@ -128,7 +128,7 @@ export function SearchComponent({
                                     
                                         <div>
                                             <select 
-                                              className="mt-2  p-1 border w-48 border-gray-300 rounded"
+                                              className="mt-2  p-1 border w-full sm:w-48 border-gray-300 rounded"
                                               id={searchText.column}
                                               value={
                                                 !selectedColumns[searchindex.column]?.searchText?'':selectedColumns[searchindex.column]?.searchText
@@ -165,7 +165,7 @@ export function SearchComponent({
             </div> */}
             <button
               onClick={OpenModel}
-              className=" ml-auto cursor-pointer sm:flex hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-4 px-6 bg-gray-800  text-base leading-4 font-normal text-white justify-center items-center "
+              className="sm:ml-auto mt-6 sm:mt-0  cursor-pointer flex hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-2 sm:py-4 px-6 bg-gray-800  text-base leading-4 font-normal text-white justify-center items-center "
             >
               <svg
                 className=" mr-2"
@@ -241,93 +241,13 @@ export function SearchComponent({
               </svg>
               Advanced Search
             </button>
-            {(searchText || Object.keys(selectedColumns)?.length > 0) &&<button onClick={handleClear} className="cursor-pointer ml-4 flex hover:bg-red-700  focus:ring focus:ring-offset-2 focus:ring-red-800 py-4 px-6 bg-red-800  text-base leading-4 font-normal text-white justify-center items-center">
+            {(searchText || Object.keys(selectedColumns)?.length > 0) &&<button onClick={handleClear} className="cursor-pointer sm:ml-4 mt-4 sm:mt-0 flex hover:bg-red-700  focus:ring focus:ring-offset-2 focus:ring-red-800 py-2 sm:py-4 px-6 bg-red-800  text-base leading-4 font-normal text-white justify-center items-center">
               Clear
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
               </svg>
             </button>}
           </div>
-          {/* <p className=" text-xl leading-5 text-gray-600 font-medium">{total}</p> */}
-          {/* Filters Button (Small Screen) */}
-          <button
-            onClick={OpenModel}
-            className=" cursor-pointer mt-6  sm:hidden hover:bg-gray-700  focus:ring focus:ring-offset-2 focus:ring-gray-800 py-2 w-full bg-gray-800 flex text-base leading-4 font-normal text-white justify-center items-center "
-          >
-            <svg
-              className=" mr-2"
-              width={24}
-              height={24}
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6 12C7.10457 12 8 11.1046 8 10C8 8.89543 7.10457 8 6 8C4.89543 8 4 8.89543 4 10C4 11.1046 4.89543 12 6 12Z"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M6 4V8"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M6 12V20"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12 18C13.1046 18 14 17.1046 14 16C14 14.8954 13.1046 14 12 14C10.8954 14 10 14.8954 10 16C10 17.1046 10.8954 18 12 18Z"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12 4V14"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12 18V20"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M18 9C19.1046 9 20 8.10457 20 7C20 5.89543 19.1046 5 18 5C16.8954 5 16 5.89543 16 7C16 8.10457 16.8954 9 18 9Z"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M18 4V5"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M18 9V20"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Advanced Search
-          </button>
         </div>
       </div>
       <style>
@@ -557,9 +477,9 @@ function DialogModel({
                     <div className="p-4 flex flex-col col-span-3 space-y-8 lg:justify-start lg:items-start md:justify-start md:items-center">
                       <div className=" flex flex-col space-y-8 justify-start items-start ">
                         {/* <p className=" lg:text-2xl text-xl lg:leading-6 leading-5 font-medium text-gray-800 ">Search By</p> */}
-                        <div className="grid grid-cols-3 w-full gap-8">
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 w-full gap-8">
                           {searchIndexs.map((searchindex) => (
-                            <div key={searchindex.column} className="flex w-full">
+                            <div key={searchindex.column} className="sm:flex w-full">
                               <input
                                 onChange={handleCheckboxChange}
                                 className="w-4 h-4 mr-2"
@@ -570,7 +490,7 @@ function DialogModel({
                                   selectedColumns[searchindex.column]?.ischecked
                                 }
                               />
-                              <div className="inline-bl ock">
+                              <div className="">
                                 {" "}
                                 <label
                                   className="mr-2 text-sm leading-3 font-normal text-gray-600"
@@ -586,7 +506,7 @@ function DialogModel({
                                         searchindex.column
                                       ) ? (
                                         <select
-                                          className="mt-2 -ml-4 p-1 border w-48 border-gray-300 rounded"
+                                          className="mt-2 sm:-ml-4 p-1 w-full border sm:w-48 border-gray-300 rounded"
                                           value={
                                             selectedColumns[searchindex.column]
                                               .searchText?selectedColumns[searchindex.column]
@@ -715,7 +635,7 @@ export default function Home() {
   };
 
   return (
-    <div className="px-20 py-10">
+    <div className="xl:px-20 xl:py-10 lg:px-16 lg:py-8 md:px-10 md:py-6 px-4 py-2 ">
       <SearchComponent
         records={records}
         setSelectedColumns={setSelectedColumns}
@@ -728,7 +648,7 @@ export default function Home() {
         setLanguage={setLanguage}
       />
       {records ? (
-        <ul role="list" className=" mt-4 grid grid-cols-3 gap-4">
+        <ul role="list" className=" mt-4 grid xl:grid-cols-3 lg:grid-cols-2 gap-4">
           {records?.map((record) => (
             <li
               key={record.id}

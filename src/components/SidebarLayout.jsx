@@ -46,7 +46,7 @@ export default function SidebarLayout() {
       <div>
 
         <div className="">
-          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-2 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-4 sm:px-4 lg:px-8">
             {/* <button type="button" onClick={() => setSidebarOpen(true)} className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
               <span className="sr-only">Open sidebar</span>
               <Bars3Icon aria-hidden="true" className="h-6 w-6" />
@@ -58,7 +58,7 @@ export default function SidebarLayout() {
               <img
                 alt="Kannada itihasa academy"
                 src={logo}
-                className="h-8 w-auto"
+                className="lg:h-8 w-auto md:h-6 h-4"
               />
               </NavLink>
             </div>
