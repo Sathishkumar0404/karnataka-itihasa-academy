@@ -100,10 +100,10 @@ export function SearchComponent({
         setLanguage={setLanguage}
       />
       <div className="2xl:container 2xl:mx-auto bg-gray-50">
-        <div className=" md:py-8 lg:px-14 md:px-6 py-6 px-4">
-          <div className=" flex justify-between items-center mb-4">
+        <div className=" md:py-6 lg:px-14 md:px-6 py-4 px-4">
+          <div className=" flex justify-between items-center">
             <div>
-              <div className="w-full space-y-3">
+              <div className="w-full flex gap-4 items-center">
                               {searchby.map((searchindex) => (
                                 <div key={searchindex.column} className="flex w-full">
                                   {/* <input
@@ -117,7 +117,7 @@ export function SearchComponent({
                                       selectedColumns[searchindex.column]?.ischecked
                                     }
                                   /> */}
-                                  <div className="inline-bl ock">
+                                  <div className="inline-block">
                                     
                                     <label
                                       className="mr-2 text-md leading-3 font-normal text-gray-800"

@@ -82,12 +82,12 @@ export default function SidebarLayout() {
                   value={searchText}
                   onChange={handleSearchTextChange}
                   placeholder="Search in Kannada"
-                  className="block w-[70%] border-0 py-0 my-2 pl-8 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
+                  className="block w-full border-0 py-0 my-2 pl-8 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
                 />
                 
               </div>
               {results.length > 0 && (
-              <ul className="absolute w-[70%] max-h-96 mt-14 overflow-y-auto z-10 bg-white border border-gray-300 rounded-md shadow-lg">
+              <ul className="absolute w-full max-h-96 mt-14 overflow-y-auto z-10 bg-white border border-gray-300 rounded-md shadow-lg">
                 {results.map((item, index) => (
                   <li
                     key={index}
